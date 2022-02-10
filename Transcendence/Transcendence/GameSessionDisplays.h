@@ -113,7 +113,7 @@ class CMenuDisplay
 		void Hide (void) { m_Buffer.Delete(); m_bInvalid = true; }
 		void Init (const RECT &rcScreen);
 		bool OnChar (char chChar, DWORD dwKeyData);
-		bool OnKeyDown (int iVirtKey, DWORD dwKeyData) { return false; }
+		bool OnKeyDown (int iVirtKey, DWORD dwKeyData);
 		bool OnLButtonDblClick (int x, int y, DWORD dwFlags) { return OnLButtonDown(x, y, dwFlags); }
 		bool OnLButtonDown (int x, int y, DWORD dwFlags);
 		bool OnLButtonUp (int x, int y, DWORD dwFlags);
@@ -131,6 +131,8 @@ class CMenuDisplay
 		static constexpr int MENU_ITEM_HPADDING =		4;
 
 		void DoCommand (int iIndex);
+		void SelectNextItem (void);
+		void SelectPreviousItem (void);
 		int HitTest (int x, int y) const;
 		void Realize (void) const;
 
@@ -146,7 +148,7 @@ class CMenuDisplay
 		int m_cxEntry = 0;							//	Width of a single entry
 		int m_cyEntry = 0;							//	Height of a single entry
 
-		int m_iHover = -1;							//	Entry that we're hovering over (or -1)
+		int m_iSelected = -1;							//	Entry that we're hovering over (or -1)
 		bool m_bDown = false;						//	TRUE if mouse is down over menu.
 
 		mutable CG32bitImage m_Buffer;
