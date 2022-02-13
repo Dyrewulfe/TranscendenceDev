@@ -35,13 +35,12 @@ void CMenuDisplay::SelectNextItem (void)
 	if (m_Data.IsEmpty())
 		return;
 
-	if (m_iSelected < 0)
+	// Clear mouse hover selection when using keyboard
+
+	m_iHover = -1;
+
+	if (++m_iSelected >= m_Data.GetCount())
 		m_iSelected = 0;
-	else
-		{
-		if (++m_iSelected >= m_Data.GetCount())
-			m_iSelected = 0;
-		}
 
 	m_Model.GetUniverse().PlaySound(NULL, m_Model.GetUniverse().FindSound(UNID_DEFAULT_SELECT));
 	}
@@ -52,20 +51,15 @@ void CMenuDisplay::SelectPreviousItem(void)
 //
 // Select and highlight the previous item in the menu
 
-{
+	{
 	if (m_Data.IsEmpty())
 		return;
 
-	if (m_iSelected < 0)
-		m_iSelected = 0;
-	else
-	{
-		if (--m_iSelected < 0)
-			m_iSelected = m_Data.GetCount() - 1;
-	}
+	if (--m_iSelected < 0)
+		m_iSelected = m_Data.GetCount() - 1;
 
 	m_Model.GetUniverse().PlaySound(NULL, m_Model.GetUniverse().FindSound(UNID_DEFAULT_SELECT));
-}
+	}
 
 int CMenuDisplay::HitTest (int x, int y) const
 
@@ -188,11 +182,14 @@ bool CMenuDisplay::OnMouseMove (int x, int y)
 //	Handle mouse move. Coordinates are relative to the session.
 
 	{
+	// Clear keyboard selection when using mouse
+
+	m_iSelected = -1;
 
 	int iHitTest = HitTest(x, y);
-	if (iHitTest != m_iSelected)
+	if (iHitTest != m_iHover)
 		{
-		m_iSelected = iHitTest;
+		m_iHover = iHitTest;
 		m_bInvalid = true;
 		}
 
@@ -267,9 +264,9 @@ void CMenuDisplay::Realize (void) const
 	int yEntry = m_yFirstEntry;
 	for (int i = 0; i < m_Data.GetCount(); i++)
 		{
-		//	Highlight slected item
+		//	Highlight selected item
 
-		if (i == m_iSelected)
+		if (i == m_iHover || i == m_iSelected)
 			m_Buffer.Fill(xEntry, yEntry, m_cxEntry, m_cyEntry, rgbBackgroundHover);
 
 		//	Center the text
@@ -279,7 +276,7 @@ void CMenuDisplay::Realize (void) const
 		int xText = xEntry + (m_cxEntry - cxText) / 2;
 		int yText = yEntry + MENU_ITEM_VPADDING;
 
-		CG32bitPixel rgbColor = (m_bDown && m_iSelected == i ? rgbTextBright : rgbText);
+		CG32bitPixel rgbColor = (m_bDown && m_iHover == i ? rgbTextBright : rgbText);
 
 		if (m_Data.GetItemAcceleratorPos(i) != -1)
 			{
@@ -297,7 +294,7 @@ void CMenuDisplay::Realize (void) const
 			MenuFont.DrawText(m_Buffer, 
 					xText, 
 					yText, 
-					(m_bDown && m_iSelected == i ? rgbTextBright : rgbText), 
+					(m_bDown && m_iHover == i ? rgbTextBright : rgbText), 
 					m_Data.GetItemLabel(i));
 			}
 
@@ -361,6 +358,7 @@ void CMenuDisplay::Show (const CMenuData &Data, const SOptions &Options)
 	m_yFirstEntry = MENU_BORDER_RADIUS + cyTitle;
 
 	m_bInvalid = true;
+	m_iHover = -1;
 	m_iSelected = -1;
 	m_bDown = false;
 	}

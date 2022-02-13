@@ -148,7 +148,8 @@ class CMenuDisplay
 		int m_cxEntry = 0;							//	Width of a single entry
 		int m_cyEntry = 0;							//	Height of a single entry
 
-		int m_iSelected = -1;							//	Entry that we're hovering over (or -1)
+		int m_iHover = -1;							//	Entry that we're hovering over (or -1)
+		int m_iSelected = -1;						//	Entry selected by cursor key input
 		bool m_bDown = false;						//	TRUE if mouse is down over menu.
 
 		mutable CG32bitImage m_Buffer;
